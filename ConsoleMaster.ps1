@@ -2,7 +2,7 @@
 $currentLocation = Split-Path -parent $PSCommandPath
 $ui = (Get-Host).UI.RawUI
 $consoleName = "Console Master"
-$consoleVersion = '1.5.0'
+$consoleVersion = '1.5.1'
 $prefix = "$consoleName $consoleVersion"
 $QuitConsole = $false
 $configFileName = "config.json"
@@ -21,14 +21,17 @@ function Set-Up-Console() {
     $jarFile = Test-Jar "Please enter the name of the server's .jar file (w/o the extension)"
     $mcVersion = Test-Version "Please enter the Minecraft version your server is using"
     $ramDataType = Test-RAM-Type
+    $minRAM = Test-Integer "Please enter your minimum amount of RAM (Random Access Memory) to use"
     $maxRAM = Test-Integer "Please enter your maximum amount of RAM (Random Access Memory) to use"
 
-    $fullRAM = -Join ($maxRAM, $ramDataType)
+    $fullRAMMin = -Join ($minRAM, $ramDataType)
+    $fullRAMMax = -Join ($maxRAM, $ramDataType)
     $basicInfo = @{
         Jar_File          = "$jarFile"
         Minecraft_Version = "$mcVersion"
-        Java_Flags        = "-Xmx$fullRAM"
-        Server_Options    = "-o true"
+        Ram_Min       = "-Xmx$fullRAMMin"
+        Ram_Max       = "-Xms$fullRAMMax"
+        Server_Options    = 'nogui'
 
     }
 
@@ -93,7 +96,7 @@ $consoleServerPrefix Starting Server...
         Write-Host "$consoleServerPrefix Ngrok is Already Running! Skipping Ngrok Startup..."
     }
     Write-Host "$consoleServerPrefix Starting .jar File Now.."
-    java $INFO.Java_Flags -jar $INFO.Jar_File $INFO.Server_Options
+    java $INFO.Ram_Min $INFO.Ram_Max -jar $INFO.Jar_File $INFO.Server_Options
 
     $ui.WindowTitle = "$consoleServerPrefixServer Stopped (Jar: " + $Script:INFO.Jar_File + ", MC " + $Script:INFO.Minecraft_Version + ")"
     Write-Host "$consoleServerPrefixServer Server Stopped! Check Above For Details!"
@@ -104,7 +107,7 @@ function Invoke-Ask-Restart(){
     $answer = Read-Host -Prompt "Would you like to restart the server? (Y)es/(N)o"
     switch ($answer.ToUpper()) {
         'Y' {
-            Write-Host $prefix+:"Restarting Server..." -BackgroundColor Red
+            Write-Host $prefix+":Restarting Server..." -BackgroundColor Red
             Start-Sleep $SleepTime
             Clear-Host
             Start-Server
@@ -242,15 +245,19 @@ function Edit-Minecraft-Version() {
 
 function Edit-RAM() {
     $newRamDataType = Test-RAM-Type
+    $newMinRAM = Test-Integer "Please enter your minimum amount of RAM (Random Access Memory) to use"
     $newMaxRAM = Test-Integer "Please enter your maximum amount of RAM (Random Access Memory) to use"
-    $newFullRAM = -Join ($newMaxRAM, $newRamDataType)
-    Save-Variable "Java_Flags" "-Xmx$newFullRAM"
+
+    $newFullMinRAM = -Join ($newMinRAM, $newRamDataType)
+    $newFullMaxRAM = -Join ($newMaxRAM, $newRamDataType)
+    Save-Variable "Ram_Min" "-Xms$newFullMinRAM"
+    Save-Variable "Ram_Max" "-Xmx$newFullMaxRAM"
     Resume-Settings-Menu
 }
 
 function Confirm-Change-Args() {
     Write-Host "Here are your original arguments:" $Script:INFO.Server_Options
-    $answer = Read-Host "Are you SURE you want to modify these arguments? (Y)es/(N)o" -ForegroundColor Red
+    $answer = Read-Host "Are you SURE you want to modify these arguments? (Y)es/(N)o"
     switch ($answer.ToUpper()) {
 
         'Y' {
