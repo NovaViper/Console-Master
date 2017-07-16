@@ -6,11 +6,20 @@ Update List Key
 (/) Other
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+v1.6.0 - July 16 2017
++ Added script to Powershell Gallery
++ Added Script Info for update checking from Powershell Gallery
++ Now to update the script, run Update-Script
++ Now you can add a custom dictionary for your java file. This gives you the ability to have the script located outside
+  of the folder where the jar is located and run the jar without having the script inside the same location as the jar.
+  Also gives the ability to quickly switch in between different jar versions without having to move around the jars.
+  Just simply change the location to look for in Console Master
+* Fixed more localization errors
 
 v1.5.1 - July 1 2017
 + Added minimal RAM
-*Fixed some localization errors
--Made the gui not open anymore
+* Fixed some localization errors
+- Made the gui not open anymore
 
 v1.5.0 - June 25 2017
 + Inital Full Release

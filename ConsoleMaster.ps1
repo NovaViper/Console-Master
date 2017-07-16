@@ -1,8 +1,46 @@
-﻿#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# VARIABLE DECLARATION #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# POWERSHELL SCRIPT INFO DECLARATION  #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+<#PSScriptInfo
+
+.VERSION 1.6.0
+
+.GUID ef7e7376-9b7f-455c-83a7-5e4b628e13f8
+
+.AUTHOR NovaViper
+
+.DESCRIPTION Powershell Script for Managing Java Servers (i.e. Minecraft, Bukkit)
+
+.COMPANYNAME
+
+.COPYRIGHT
+
+.TAGS java minecraft bukkit server manager
+
+.LICENSEURI https://raw.githubusercontent.com/NovaViper/Console-Master/master/LICENSE
+
+.PROJECTURI https://github.com/NovaViper/Console-Master/tree/master
+
+.RELEASENOTES
+https://raw.githubusercontent.com/NovaViper/Console-Master/master/changelog.txt
+
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.PRIVATEDATA
+
+#>
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# VARIABLE DECLARATION #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 $currentLocation = Split-Path -parent $PSCommandPath
+$PSScriptInfo = Test-ScriptFileInfo -Path "$currentLocation\ConsoleMaster.ps1"
 $ui = (Get-Host).UI.RawUI
 $consoleName = "Console Master"
-$consoleVersion = '1.5.1'
+$consoleVersion = $PSScriptInfo.Version
+$consoleServerPrefix = "[" + $consoleName + "]:"
 $prefix = "$consoleName $consoleVersion"
 $QuitConsole = $false
 $configFileName = "config.json"
@@ -14,11 +52,19 @@ Set-Location $currentLocation
 
 function Set-Up-Console() {
     Clear-Host
-    $ui.WindowTitle = $prefix+": Server Running (Jar: , MC )"
+    $ui.WindowTitle = $prefix + ": Server Running (Jar: , MC )"
     Write-Host "Welcome To $prefix!!"
     Write-Host ''
 
     $jarFile = Test-Jar "Please enter the name of the server's .jar file (w/o the extension)"
+    $useCustomJarLocation = Confirm-Custom-Jar-Location
+    if($useCustomJarLocation -eq 'Y'){
+        $jarLocation = Test-Jar-Path "Where is your jar file? (w/o the backslash '\' at the end or begining)" $jarFile
+        $newLocation = -Join ($currentLocation, "\",$jarLocation)
+        Set-Location $newLocation
+    }else{
+        $jarLocation = ''
+    }
     $mcVersion = Test-Version "Please enter the Minecraft version your server is using"
     $ramDataType = Test-RAM-Type
     $minRAM = Test-Integer "Please enter your minimum amount of RAM (Random Access Memory) to use"
@@ -29,13 +75,13 @@ function Set-Up-Console() {
     $basicInfo = @{
         Jar_File          = "$jarFile"
         Minecraft_Version = "$mcVersion"
-        Ram_Min       = "-Xmx$fullRAMMin"
-        Ram_Max       = "-Xms$fullRAMMax"
+        Ram_Min           = "-Xmx$fullRAMMin"
+        Ram_Max           = "-Xms$fullRAMMax"
         Server_Options    = 'nogui'
 
     }
 
-    New-Item $configFileName -ItemType "file" | Out-Null
+   New-Item $configFileName -ItemType "file" | Out-Null
     $basicInfo | ConvertTo-Json | Set-Content $configFileName
 
     Write-Host ""
@@ -80,8 +126,7 @@ function Invoke-Main-Menu() {
 }
 
 function Start-Server() {
-    $consoleServerPrefix = "[" + $consoleName + "]:"
-    $ui.WindowTitle = $prefix+": Server Running (Jar: " + $Script:INFO.Jar_File + ", MC " + $Script:INFO.Minecraft_Version + ")"
+    $ui.WindowTitle = $prefix + ": Server Running (Jar: " + $Script:INFO.Jar_File + ", MC " + $Script:INFO.Minecraft_Version + ")"
     Write-Host @"
 ------------------------------- SERVER LOG START -------------------------------
 $consoleServerPrefix Starting Server...
@@ -96,6 +141,7 @@ $consoleServerPrefix Starting Server...
         Write-Host "$consoleServerPrefix Ngrok is Already Running! Skipping Ngrok Startup..."
     }
     Write-Host "$consoleServerPrefix Starting .jar File Now.."
+
     java $INFO.Ram_Min $INFO.Ram_Max -jar $INFO.Jar_File $INFO.Server_Options
 
     $ui.WindowTitle = "$consoleServerPrefixServer Stopped (Jar: " + $Script:INFO.Jar_File + ", MC " + $Script:INFO.Minecraft_Version + ")"
@@ -103,11 +149,11 @@ $consoleServerPrefix Starting Server...
     Invoke-Ask-Restart
 }
 
-function Invoke-Ask-Restart(){
+function Invoke-Ask-Restart() {
     $answer = Read-Host -Prompt "Would you like to restart the server? (Y)es/(N)o"
     switch ($answer.ToUpper()) {
         'Y' {
-            Write-Host $prefix+":Restarting Server..." -BackgroundColor Red
+            Write-Host "Restarting Server..." -BackgroundColor Red
             Start-Sleep $SleepTime
             Clear-Host
             Start-Server
@@ -186,8 +232,8 @@ function Invoke-Settings-Menu() {
     Write-Host @"
 -------------------------------- Settings Menu --------------------------------
 
-    1. Change Jar - Change the saved jar file name that the script
-                    executes
+    1. Change Jar - Change the either saved jar file name or location
+                    that the script executes
     2. Change Version - Change the saved Minecraft version to match
                         what the jar file uses
     3. RAM Allocation - Set the amount of RAM (Random Access Memory)
@@ -233,7 +279,15 @@ function Invoke-Settings-Menu() {
 
 function Edit-Jar-File() {
     $newJar = Test-Jar "Please enter the new name of the server's .jar file (w/o the extension)"
-    Save-Variable "Jar_File" $newJar
+    $useCustomJarLocation = Confirm-Custom-Jar-Location
+    if($useCustomJarLocation -eq 'Y'){
+        $newJarLocation = Test-Jar-Path "Where is your jar file?" $newJar
+    }else{
+        $newJarLocation = ''
+    }
+
+    $newFullJarPath = -Join ($newJarLocation, $newJar)
+    Save-Variable "Jar_File" $newFullJarPath
     Resume-Settings-Menu
 }
 
@@ -296,19 +350,27 @@ function Edit-Args() {
 function Confirm-Factory-Reset() {
     Write-Host "Are you sure you want to reset back to factory default? This process CANNOT be reversed!!" -ForegroundColor Red
     $answer = Read-Host "(Y)es or (N)o"
-    switch ($answer.ToUpper()) {
+    if (($null -eq $answer) -or ($answer -eq '')) {
+        Write-Output ''
+        $answer = ''
+        Invaild-Choice "You cannot enter a null/empty name!"
+        Confirm-Factory-Reset
+    }
+    else {
+        switch ($answer.ToUpper()) {
 
-        'Y' {
-            Clear-Host
-            Initialize-Factory-Reset
-        }
-        'N' {
-            Clear-Host
-            Resume-Settings-Menu
-        }
-        default {
-            Invaild-Choice "INVALID CHOICE! PLEASE ENTER ONE OF THE CHOICES LISTED!"
-            Confirm-Factory-Reset
+            'Y' {
+                Clear-Host
+                Initialize-Factory-Reset
+            }
+            'N' {
+                Clear-Host
+                Resume-Settings-Menu
+            }
+            default {
+                Invaild-Choice "INVALID CHOICE! PLEASE ENTER ONE OF THE CHOICES LISTED!"
+                Confirm-Factory-Reset
+            }
         }
     }
 }
@@ -373,6 +435,44 @@ function Test-Jar([string]$promptMessage) {
         }
         else {
             return $data + '.jar'
+        }
+    }
+}
+
+function Confirm-Custom-Jar-Location(){
+    $answer = ''
+    $ValidChoices = ('Y', 'N')
+    While ($answer -notin $ValidChoices) {
+        $answer = (Read-Host -Prompt 'Would you like to add a custom path for your jar file? [Y]es/[N]o').ToUpper()
+
+        if ($answer -notin $ValidChoices) {
+            $answer = ''
+            Invaild-Choice "INVALID CHOICE! PLEASE ENTER ONE OF THE CHOICES LISTED!"
+        }
+        else {
+            return $answer
+        }
+    }
+}
+
+function Test-Jar-Path([string]$promptMessage, [string]$jarFile) {
+    $data = ''
+    While (($null -eq $data) -or ($data -eq '')) {
+        $data = Read-Host -Prompt $promptMessage
+        $dataWithJar = -Join ($data,"\",$jarFile)
+
+        if (($null -eq $data) -or ($data -eq '')) {
+            Write-Output ''
+            $data = ''
+            Invaild-Choice "You cannot enter a null/empty name!"
+        }
+        elseif (!(Test-Path $dataWithJar)) {
+            Write-Output ''
+            Invaild-Choice "Could not locate $jarFile in the folder, $data"
+            $data = ''
+        }
+        else {
+            return -Join ($data,"\")
         }
     }
 }
