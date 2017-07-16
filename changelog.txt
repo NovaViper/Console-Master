@@ -1,0 +1,19 @@
+Update List Key
+(+) A new feature
+(-) A removed feature
+(#) A changed feature
+(*) A bug fix
+(/) Other
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+v1.5.1 - July 1 2017
++ Added minimal RAM
+*Fixed some localization errors
+-Made the gui not open anymore
+
+v1.5.0 - June 25 2017
++ Inital Full Release
+
+v1.0.0 - June 20 2017
++ Initial Beta Release
