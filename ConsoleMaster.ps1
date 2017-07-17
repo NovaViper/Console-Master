@@ -1,7 +1,7 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# POWERSHELL SCRIPT INFO DECLARATION  #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 <#PSScriptInfo
 
-.VERSION 1.6.7
+.VERSION 1.6.8
 
 .GUID ef7e7376-9b7f-455c-83a7-5e4b628e13f8
 
@@ -58,7 +58,7 @@ function Set-Up-Console() {
 
     $jarFile = Test-Jar "Please enter the name of the server's .jar file (w/o the extension)"
     $useCustomJarLocation = Confirm-Custom-Jar-Location
-    if($useCustomJarLocation -eq 'Y'){
+    if($useCustomJarLocation -eq $true){
         $jarLocation = Test-Jar-Path "Where is your jar file? (w/o the backslash '\' at the end or begining)" $jarFile
     }else{
         $jarLocation = ''

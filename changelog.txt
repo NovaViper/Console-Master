@@ -6,6 +6,9 @@ Update List Key
 (/) Other
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+v1.6.8 - July 16 2017
+* Fixed bug with saving version data after changes via settings menu
+
 v1.6.7 - July 16 2017
 * Fixed saving bug after changing the custom jar location via settings menu
 
