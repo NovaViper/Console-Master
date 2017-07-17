@@ -6,6 +6,9 @@ Update List Key
 (/) Other
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+v1.6.7 - July 16 2017
+* Fixed saving bug after changing the custom jar location via settings menu
+
 v1.6.6 - July 16 2017
 * Fixed bug where the console invailded jar location when using the new custom locations
 * Fixed bug where after using the custom locations (then reverting back to the normal method), the console would still

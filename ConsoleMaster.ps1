@@ -1,19 +1,19 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# POWERSHELL SCRIPT INFO DECLARATION  #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 <#PSScriptInfo
 
-.VERSION 1.6.6
+.VERSION 1.6.7
 
 .GUID ef7e7376-9b7f-455c-83a7-5e4b628e13f8
 
 .AUTHOR NovaViper
 
-.DESCRIPTION Powershell Script for Managing Java Servers (i.e. Minecraft, Bukkit)
+.DESCRIPTION Powershell Script for Managing Java Servers (i.e. Minecraft, Bukkit). NOTE: After installing the script, please place it somewhere useful! (Not within the ProgramFiles Powershell Script installation dictionary, the script will NOT function in there!)
 
 .COMPANYNAME
 
 .COPYRIGHT
 
-.TAGS java minecraft bukkit server manager
+.TAGS java minecraft bukkit server manager PSScript
 
 .LICENSEURI https://raw.githubusercontent.com/NovaViper/Console-Master/master/LICENSE
 
@@ -282,7 +282,7 @@ function Invoke-Settings-Menu() {
 function Edit-Jar-File() {
     $newJar = Test-Jar "Please enter the new name of the server's .jar file (w/o the extension)"
     $useCustomJarLocation = Confirm-Custom-Jar-Location
-    if($useCustomJarLocation -eq 'Y'){
+    if($useCustomJarLocation -eq $true){
         $jarLocation = Test-Jar-Path "Where is your jar file? (w/o the backslash '\' at the end or begining)" $jarFile
     }else{
         $jarLocation = ''
