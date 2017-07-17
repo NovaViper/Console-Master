@@ -1,7 +1,7 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# POWERSHELL SCRIPT INFO DECLARATION  #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 <#PSScriptInfo
 
-.VERSION 1.6.0
+.VERSION 1.6.6
 
 .GUID ef7e7376-9b7f-455c-83a7-5e4b628e13f8
 
@@ -60,8 +60,6 @@ function Set-Up-Console() {
     $useCustomJarLocation = Confirm-Custom-Jar-Location
     if($useCustomJarLocation -eq 'Y'){
         $jarLocation = Test-Jar-Path "Where is your jar file? (w/o the backslash '\' at the end or begining)" $jarFile
-        $newLocation = -Join ($currentLocation, "\",$jarLocation)
-        Set-Location $newLocation
     }else{
         $jarLocation = ''
     }
@@ -73,16 +71,18 @@ function Set-Up-Console() {
     $fullRAMMin = -Join ($minRAM, $ramDataType)
     $fullRAMMax = -Join ($maxRAM, $ramDataType)
     $basicInfo = @{
-        Jar_File          = "$jarFile"
-        Minecraft_Version = "$mcVersion"
-        Ram_Min           = "-Xmx$fullRAMMin"
-        Ram_Max           = "-Xms$fullRAMMax"
-        Server_Options    = 'nogui'
+        Jar_File                        = "$jarFile"
+        Use_Custom_Location             = "$useCustomJarLocation"
+        Custom_Location                 = "$jarLocation"
+        Minecraft_Version               = "$mcVersion"
+        Ram_Min                         = "-Xmx$fullRAMMin"
+        Ram_Max                         = "-Xms$fullRAMMax"
+        Server_Options                  = 'nogui'
 
     }
 
    New-Item $configFileName -ItemType "file" | Out-Null
-    $basicInfo | ConvertTo-Json | Set-Content $configFileName
+   $basicInfo | ConvertTo-Json | Set-Content $configFileName
 
     Write-Host ""
     Write-Host "Moving to Main Menu..." -BackgroundColor Red
@@ -126,6 +126,7 @@ function Invoke-Main-Menu() {
 }
 
 function Start-Server() {
+    Test-Use-Custom-Location
     $ui.WindowTitle = $prefix + ": Server Running (Jar: " + $Script:INFO.Jar_File + ", MC " + $Script:INFO.Minecraft_Version + ")"
     Write-Host @"
 ------------------------------- SERVER LOG START -------------------------------
@@ -146,6 +147,7 @@ $consoleServerPrefix Starting Server...
 
     $ui.WindowTitle = "$consoleServerPrefixServer Stopped (Jar: " + $Script:INFO.Jar_File + ", MC " + $Script:INFO.Minecraft_Version + ")"
     Write-Host "$consoleServerPrefixServer Server Stopped! Check Above For Details!"
+    Test-Use-Custom-Location
     Invoke-Ask-Restart
 }
 
@@ -281,13 +283,14 @@ function Edit-Jar-File() {
     $newJar = Test-Jar "Please enter the new name of the server's .jar file (w/o the extension)"
     $useCustomJarLocation = Confirm-Custom-Jar-Location
     if($useCustomJarLocation -eq 'Y'){
-        $newJarLocation = Test-Jar-Path "Where is your jar file?" $newJar
+        $jarLocation = Test-Jar-Path "Where is your jar file? (w/o the backslash '\' at the end or begining)" $jarFile
     }else{
-        $newJarLocation = ''
+        $jarLocation = ''
     }
 
-    $newFullJarPath = -Join ($newJarLocation, $newJar)
-    Save-Variable "Jar_File" $newFullJarPath
+    Save-Variable "Jar_File" $newJar
+    Save-Variable "Custom_Location" $jarLocation
+    Save-Variable "Use_Custom_Location" $useCustomJarLocation
     Resume-Settings-Menu
 }
 
@@ -440,17 +443,25 @@ function Test-Jar([string]$promptMessage) {
 }
 
 function Confirm-Custom-Jar-Location(){
-    $answer = ''
-    $ValidChoices = ('Y', 'N')
-    While ($answer -notin $ValidChoices) {
-        $answer = (Read-Host -Prompt 'Would you like to add a custom path for your jar file? [Y]es/[N]o').ToUpper()
-
-        if ($answer -notin $ValidChoices) {
-            $answer = ''
-            Invaild-Choice "INVALID CHOICE! PLEASE ENTER ONE OF THE CHOICES LISTED!"
-        }
-        else {
-            return $answer
+    $answer = Read-Host -Prompt  "Would you like to add a custom path for your jar file? [Y]es/[N]o"
+    if (($null -eq $answer) -or ($answer -eq '')) {
+        Write-Output ''
+        $answer = ''
+        Invaild-Choice "You cannot enter a null/empty name!"
+        Confirm-Custom-Jar-Location
+    }
+    else {
+        switch ($answer.ToUpper()) {
+            'Y' {
+                 return $true
+            }
+            'N' {
+                return $false
+            }
+            default {
+                Invaild-Choice "INVALID CHOICE! PLEASE ENTER ONE OF THE CHOICES LISTED!"
+                Confirm-Custom-Jar-Location
+            }
         }
     }
 }
@@ -459,7 +470,7 @@ function Test-Jar-Path([string]$promptMessage, [string]$jarFile) {
     $data = ''
     While (($null -eq $data) -or ($data -eq '')) {
         $data = Read-Host -Prompt $promptMessage
-        $dataWithJar = -Join ($data,"\",$jarFile)
+        $dataWithJar = -Join ($currentLocation,"\",$data,"\",$jarFile)
 
         if (($null -eq $data) -or ($data -eq '')) {
             Write-Output ''
@@ -472,8 +483,15 @@ function Test-Jar-Path([string]$promptMessage, [string]$jarFile) {
             $data = ''
         }
         else {
-            return -Join ($data,"\")
+            return -Join ($currentLocation, "\", $data,"\")
         }
+    }
+}
+function Test-Use-Custom-Location(){
+    if($Script:INFO.Use_Custom_Location -eq $true){
+        Set-Location $Script:INFO.Custom_Location
+    }else{
+        Set-Location $currentLocation
     }
 }
 
