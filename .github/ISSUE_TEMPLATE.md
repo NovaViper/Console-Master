@@ -7,7 +7,7 @@
 * OS Name, Edition, Byte Type, and Build Version: (i.e. Windows 10 Home Edition 64 bit)
 
 ## Logs
-- fml-client-latest.log or fml-server-latest.log: 
+-  
 
 ## Issue Description:
 
