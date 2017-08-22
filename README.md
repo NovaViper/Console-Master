@@ -6,7 +6,7 @@ You can get it from the [Releases](https://github.com/NovaViper/Console-Master/r
 
 # Installation Instructions
  1. Ensure you have **Powershell 5.1 (This version came with my PC, thus it was made for it. I'm unsure older versions will cope)**
- 2. Open an instance of Powershell in **administrative** mode
+ 2. Open an instance of Powershell in **administrative** mode and **[Ngrok](https://ngrok.com)** (you visit [this video](https://www.youtube.com/watch?v=ar-9Ku0vBeo&feature=youtu.be) to see the full process of setting up Ngrok to work with your Minecraft server) installed on your machine
  3. Set PowerShell's Execution Policy to either `RemoteSigned` or `Unrestricted` by running `Set-ExecutionPolicy "PolicyNameHere"`
  4. Then run the command `Install-Script -Name ConsoleMaster` to save the script
  5. The script should be downloaded, now locate it within your installation dictionry and place it somewhere useful and that **does not** require administrative permissions
