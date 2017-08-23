@@ -7,6 +7,9 @@ You can get it from the [Releases](https://github.com/NovaViper/Console-Master/r
 # Virus Note
 I can assure you that the ConsoleMaster.ps1 file is 100% safe! The entire zip package (with the script and the README) has been tested at [Virus Total](https://www.virustotal.com/#/file/138b82c1d250767ace9dd1e177ea7b8337e7a172ab490118a2f07ac101d125fc/detection). Any detections are false positives and should be ignored
 
+# Update Note
+Because Console Master is a Powershell script, it does not have to be re-downloaded for every new update! Just run the command `Update-Script ConsoleMaster -Verbose` and Powershell will begin to update the script automatically! **However, this case would only work if you had installed Console Master through the Powershell Gallery Method.** If you just downloaded the script itself, you'll need to re-download it for every new update.
+
 # Installation Instructions
 ## Powershell Gallery Method
  1. Ensure you have **Powershell 5.1 (This version came with my PC, thus it was made for it. I'm unsure older versions will cope)** and **[Ngrok](https://ngrok.com)** (you visit [this video](https://www.youtube.com/watch?v=ar-9Ku0vBeo&feature=youtu.be) to see the full process of setting up Ngrok to work with your Minecraft server) installed on your machine
