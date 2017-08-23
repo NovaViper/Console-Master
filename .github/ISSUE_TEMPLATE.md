@@ -1,3 +1,12 @@
+--------------------------------------------------------------------------------
+
+**BEFORE SUBMITTING!**
+
+You must ensure the view the following guidelines at this link: https://github.com/NovaViper/Console-Master/blob/master/.github/CONTRIBUTING.md
+
+After viewing the guidelines, you may delete this header
+
+--------------------------------------------------------------------------------
 ## Environment And Mod Information:
 
 * Console Master version: (i.e. 1.5.0)
