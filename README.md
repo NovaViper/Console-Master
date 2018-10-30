@@ -1,3 +1,10 @@
+[![Github All Releases](https://img.shields.io/github/downloads/NovaViper/Console-Master/total.svg)](https://github.com/NovaViper/Console-Master/releases/releases) [![GitHub license](https://img.shields.io/github/license/NovaViper/Console-Master.svg)](https://github.com/NovaViper/Console-Master/blob/master/LICENSE) 
+[![GitHub stars](https://img.shields.io/github/stars/NovaViper/Console-Master.svg)](https://github.com/NovaViper/Console-Master/stargazers) 
+[![GitHub forks](https://img.shields.io/github/forks/NovaViper/Console-Master.svg)](https://github.com/NovaViper/Console-Master/network)
+
+
+
+
 # What is Console Master?
 Console Master is a **Powershell Script** for managing java based servers (**tested** with Minecraft, Minecraft Forge, and Bukkit)
 
